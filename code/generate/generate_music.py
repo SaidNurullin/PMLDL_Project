@@ -142,5 +142,7 @@ instruments = instruments[0]
 indices = []
 
 indices.append(1)
+indices.append(2)
+
 
 generate_music(instrument_network_input, encoders, n_vocabs, models, scalers, instruments, indices)
