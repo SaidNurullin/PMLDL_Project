@@ -7,9 +7,8 @@ import pickle
 def generate_music(network_input, note_encoder, instrument_encoder, n_vocab, model, starts_scaler, durations_scaler, velocity_scaler, instruments):
     # Create MIDI data
     midi = pretty_midi.PrettyMIDI()
-    instrument_track = pretty_midi.Instrument(program=0)
 
-    num_notes_to_generate = 100
+    num_notes_to_generate = 500
 
     start = np.random.randint(0, len(network_input) - 1)
 
@@ -68,26 +67,29 @@ def generate_music(network_input, note_encoder, instrument_encoder, n_vocab, mod
     # print(prediction_starts[:10])
     # print(prediction_durations[:10])
 
-    for i, note_name in enumerate(prediction_output):
+    for j in range(len(instruments)):
 
-        if i == 1:
-            note_start = prediction_starts[i]
-        else:
-            note_start = prediction_starts[i] + note_start
-        note_end = note_start + prediction_durations[i]
+        instrument_track = pretty_midi.Instrument(program=0)
+        instrument_track.name = instruments[j]
 
-        if(not(prediction_instruments[i] in instruments)):
-            continue
+        for i, note_name in enumerate(prediction_output):
 
-        # print(note_start)
+            if i == 1:
+                note_start = prediction_starts[i]
+            else:
+                note_start = prediction_starts[i] + note_start
+            note_end = note_start + prediction_durations[i]
 
-        note_velocity = int(prediction_velocities[i])
+            if(not(prediction_instruments[i] == instrument_track.name)):
+                continue
 
-        note = pretty_midi.Note(velocity=note_velocity, pitch=int(note_name), start=note_start, end=note_end)
-        instrument_track.notes.append(note)
+            # print(note_start)
 
-        # Assign instrument to note
-        instrument_track.name = prediction_instruments[i]
+            note_velocity = int(prediction_velocities[i])
+
+            note = pretty_midi.Note(velocity=note_velocity, pitch=int(note_name), start=note_start, end=note_end)
+
+            instrument_track.notes.append(note)
 
         # print(prediction_instruments[i])
 
@@ -150,7 +152,7 @@ instruments = instruments[0]
 model = model[0]
 network_input = network_input[0]
 
-# instruments = instruments[:1]
+# instruments = instruments[1:]
 # print(instruments)
 
 generate_music(network_input, encoders[1], encoders[0], n_vocab, model, scalers[1], scalers[0], scalers[2], instruments)
