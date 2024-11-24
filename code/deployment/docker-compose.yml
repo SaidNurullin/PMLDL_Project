@@ -1,0 +1,22 @@
+services:
+  api:
+    container_name: api
+    volumes:
+      - ../../models:/app/models
+
+    build:
+      context: ./api
+    ports:
+      - "8000:8000"
+
+  app:
+    container_name: app
+    build:
+      context: ./app
+    environment:
+      - API_URI=api
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api 
+
